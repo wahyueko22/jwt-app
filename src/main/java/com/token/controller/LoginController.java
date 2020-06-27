@@ -41,23 +41,11 @@ public class LoginController {
 		return new ResponseEntity<Object>(baseDto, HttpStatus.OK);
 	}
 
-	@PostMapping("/extracts")
-	public ResponseEntity<Object> extractToken(HttpServletRequest request) throws Exception {
-		String requestTokenHeader = request.getHeader("Authorization");
-		String token = requestTokenHeader.substring(7);
-		logger.info("token = {}", token);
-		LoginResponse loginResponse = loginService.extractToken(token);
-		BaseResponseDTO baseDto = new BaseResponseDTO(Constant.RESPONSE_STRING_SUCCESS, null,
-				Constant.RESPONSE_SUCCESS_CODE, Constant.RESPONSE_SUCCESS_MESSAGE, loginResponse);
-		return new ResponseEntity<Object>(baseDto, HttpStatus.OK);
-	}
-
 	@GetMapping("/refreshtoken")
-	public ResponseEntity<Object> refreshToken(@RequestHeader("Authorization") String refreshToken) throws Exception {
+	public ResponseEntity<Object> refreshToken(@RequestHeader("refreshToken") String refreshToken) throws Exception {
 		LoginResponse loginResponse = loginService.refreshToken(refreshToken);
 		BaseResponseDTO baseDto = new BaseResponseDTO(Constant.RESPONSE_STRING_SUCCESS, null,
 				Constant.RESPONSE_SUCCESS_CODE, Constant.RESPONSE_SUCCESS_MESSAGE, loginResponse);
 		return new ResponseEntity<Object>(baseDto, HttpStatus.OK);
-
 	}
 }

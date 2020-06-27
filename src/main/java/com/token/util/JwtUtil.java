@@ -103,17 +103,6 @@ public class JwtUtil {
 	}
 
 	
-	public static UserData getUserData(HttpServletRequest request) throws CustomException {
-		if(StringUtils.isEmpty(request.getHeader("userId")))
-			throw new CustomException("L0003", "Invalid user");
-		if(StringUtils.isEmpty(request.getHeader("roles")) || "[]".equals(request.getHeader("roles")))
-			throw new CustomException("L0002", "Roles is not set yet");
-		logger.info("userId : {}", request.getHeader("userId"));
-		logger.info("Roles : {}", request.getHeader("roles"));
-		String[] arrRole = request.getHeader("roles").replace("[", "").replace("]", "").split(",");
-		Set<String> setRole = new HashSet<>(Arrays.asList(arrRole));
-		UserData userData = new UserData(request.getHeader("userId"), setRole);
-		return userData;
-	}
+	
 	
 }

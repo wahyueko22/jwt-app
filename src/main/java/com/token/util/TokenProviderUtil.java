@@ -3,27 +3,32 @@ package com.token.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+import com.token.object.UserData;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.impl.crypto.MacProvider;
 
 import java.security.Key;
+import java.util.Arrays;
 //https://github.com/szerhusenBC/jwt-spring-security-demo/blob/master/src/main/java/org/zerhusen/security/jwt/TokenProvider.java
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Component
 public class TokenProviderUtil {
 	private static Logger logger = LoggerFactory.getLogger(TokenProviderUtil.class);
-	private String AUTHORITIES_KEY = "role";
+	
 	private static final Key key = MacProvider.generateKey();
 
-	public String createToken(String userId, String userName, Set<String> lsRole, Date expiredTime) {
-		return Jwts.builder().setId(userId).setSubject(userName).claim(AUTHORITIES_KEY, lsRole)
+	public static String createToken(String userId, String userName, Set<String> lsRole, Date expiredTime) {
+		return Jwts.builder().setId(userId).setSubject(userName).claim(Constant.AUTHORITIES_KEY, lsRole)
 				.signWith(key, SignatureAlgorithm.HS512).setIssuedAt(new Date()).setExpiration(expiredTime).compact();
 	}
 
-	public Claims getAuthentication(String token) throws Exception {
+	public static Claims getAuthentication(String token) throws Exception {
 		Claims claims = null;
 		try {
 			claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
@@ -46,7 +51,7 @@ public class TokenProviderUtil {
 		return claims;
 	}
 
-	public boolean validateToken(String authToken) {
+	public static boolean validateToken(String authToken) {
 		try {
 			Jwts.parser().setSigningKey(key).parseClaimsJws(authToken);
 			return true;
@@ -64,5 +69,17 @@ public class TokenProviderUtil {
 			logger.trace("JWT token compact of handler are invalid trace: {}", e);
 		}
 		return false;
+	}
+	
+	public static UserData getUserData(String authorizationHeader) throws Exception {
+		String token = authorizationHeader.substring(7);
+		Claims claims = getAuthentication(token);
+		logger.info("claims = {}", claims);
+		if(StringUtils.isEmpty(claims.get(Constant.AUTHORITIES_KEY)) || "[]".equals(claims.get(Constant.AUTHORITIES_KEY))) {
+			throw new CustomException("L0002", "Roles is not set yet");
+		}
+		String[] arrRole = claims.get(Constant.AUTHORITIES_KEY).toString().replace("[", "").replace("]", "").split(",");
+		Set<String> setRole = new HashSet<>(Arrays.asList(arrRole));
+		return new UserData(claims.getId(),setRole);
 	}
 }

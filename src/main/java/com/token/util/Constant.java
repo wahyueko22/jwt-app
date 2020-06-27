@@ -6,6 +6,8 @@ public class Constant {
 	public static final String defaultFormatTimeStamp = "yyyy-MM-dd HH:mm";
 	public static final String STRING_SAP_SUCCESS_CODE = "000";
 	
+	public static final String AUTHORITIES_KEY = "role";
+	
 	public static final String RESPONSE_STRING_ERROR = "error";
 	public static final String RESPONSE_STRING_SUCCESS = "success";
 	public static final String RESPONSE_SUCCESS_CODE = "SUCC-00001";
